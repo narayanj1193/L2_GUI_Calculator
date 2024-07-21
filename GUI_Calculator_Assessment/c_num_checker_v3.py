@@ -1,4 +1,5 @@
 import fractions
+from c_basic_int_checker import int_checker
 
 
 # Function that checks if an input is valid. If int_only is false it works well for equations, as it allows all sorts
@@ -42,28 +43,20 @@ def num_check(question, int_only=True):
                         print(error)
                         continue
 
-                # error handling (errors happen alot 🥲)
+                # error handling
                 except (NameError, ZeroDivisionError, SyntaxError, TypeError, SyntaxWarning):
                     print(error)
                     continue
 
-            # if int_only is true
+        else:
+            # If int_only is True, use the int_checker function for validation
+            validated_response = int_checker(response, error)
+
+            if validated_response == "end_game":
+                return "end_game"
+
             else:
-                try:
-                    # Check that the response is an integer
-                    response = int(response)
-
-                    # if the amount is too low or too high
-                    if response < 1 or response > 50:
-                        print("Please enter an integer that is more than 1 and less than 50.")
-
-                        continue
-
-                except ValueError:
-                    print(error)
-                    continue
-                return response
-
+                return validated_response
 
 amount_rounds = num_check("How many questions will you be asking? ")
 rounds_completed = 0
