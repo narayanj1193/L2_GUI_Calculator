@@ -1,74 +1,60 @@
-import fractions
+from tkinter import messagebox
+import customtkinter
 
 
-# Function that checks if an input is valid. If int_only is false it works well for equations, as it allows all sorts
-# of inputs including floats and strings. Took this from a previous project
-def num_check(question, int_only=True):
-    error = "Please enter a valid number or 'xxx' to exit."
+def customtkinter_initialise():
+    # set gui(customtkinter) appearance modes
+    customtkinter.set_appearance_mode("dark")
+    customtkinter.set_default_color_theme("blue")
 
+    main = customtkinter.CTk()
+    main.title('Calculator')
+    main.geometry('700x700')
+    main.resizable(width=False, height=False)
+    return main
+
+
+# Simple number checker to check for integers.
+def num_checker(user_number, mode, error_label, upper_boundary=None, lower_boundary=None):
     while True:
-        response = input(question)
 
-        if response == "xxx":
-            return "end_game"
+        try:
+            # Check that the response is an integer
+            user_number = mode(user_number)
 
-        elif response == "":
-            if int_only:
-                # If an empty string is entered and only integers are allowed, return the empty string
-                return response
+            if user_number < lower_boundary or user_number > upper_boundary:
+                messagebox.showerror(f'ERROR ({error_label})',
+                                     f"Please enter a number that is more than {lower_boundary} and less than "
+                                     f"{upper_boundary}")
+            return user_number
+
+        except ValueError:
+            if mode == int:
+                error_message = f"Please enter an INTEGER that is more than {lower_boundary} and less than " \
+                                f"{upper_boundary}"
             else:
-                print(error)
-                continue
-
-        elif response != "":
-            if not int_only:
-                response = str(response)
-
-                # If non-integer values are allowed, check for special cases and evaluate the response
-                if response.lower() == 'x' or ('x' in response.lower() and '+' in response or '-' in response):
-                    # If the response contains 'x' with '+' or '-', return the response
-                    return response
-
-                if '^' in response and '2' in response:
-                    # If the response contains '^' and '2', return the response
-                    return response
-
-                try:
-                    number = eval(response)
-                    if isinstance(number, float) or isinstance(number, int) or isinstance(number, fractions.Fraction):
-                        # If the evaluated response is a float, integer, or fraction, return the number
-                        return number
-                    else:
-                        print(error)
-                        continue
-
-                # error handling (errors happen alot 🥲)
-                except (NameError, ZeroDivisionError, SyntaxError, TypeError, SyntaxWarning):
-                    print(error)
-                    continue
-
-            # if int_only is true
-            else:
-                try:
-                    # Check that the response is an integer
-                    response = int(response)
-
-                    # if the amount is too low or too high
-                    if response < 1 or response > 50:
-                        print("Please enter an integer that is more than 1 and less than 50.")
-
-                        continue
-
-                except ValueError:
-                    print(error)
-                    continue
-                return response
+                error_message = f"Please enter a" '\033[1m' "valid number" '\033[0m' \
+                                "that is more than {lower_boundary} and less than " \
+                                f"{upper_boundary}"
+            messagebox.showerror(error_message)
+            return
 
 
-amount_rounds = num_check("How many questions will you be asking? ")
-rounds_completed = 0
+def calculate_button():
+    user_number = entry_box.get()  # Get the value from entry box
+    print(user_number)
+    num_checker(user_number, float, 'Entry box', 500, -500)
 
-while amount_rounds > rounds_completed:
-    rounds_completed += 1
-    user_equation = num_check("What is your equation? ", False)
-    print(user_equation)
+
+c_app = customtkinter_initialise()
+
+# entrybox for user to enter the known x or y value
+font1 = ('Verdana', 32, 'bold')
+
+entry_box = customtkinter.CTkEntry(c_app, font=font1, width=300, height=72)
+entry_box.place(relx=0.282, rely=0.3)
+
+widget_calculate_button = customtkinter.CTkButton(c_app, font=font1, width=300, height=72, text='Calculate',
+                                                  command=calculate_button)
+widget_calculate_button.place(relx=0.282, rely=0.5)
+c_app.mainloop()
